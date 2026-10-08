@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Заявка</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(160deg, #AFC4FF 0%, #C6B4FF 42%, #FFC2E0 78%, #FFD9C2 100%);
+    background-attachment: fixed;
+    color: #211A3B;
+    padding-bottom: 76px;
+  }
+  .wrap { max-width: 460px; margin: 0 auto; padding: 1.75rem 1.25rem 1rem; }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; margin: 0; line-height: 1.1; }
+  .sub { font-size: 14px; color: #564B7A; margin-top: 6px; }
+  .card {
+    background: rgba(255,255,255,0.68);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 20px; padding: 1.25rem;
+  }
+  .fld { margin-bottom: 11px; }
+  .fld label { display: block; font-size: 12px; color: #564B7A; margin: 0 0 5px 3px; }
+  .fld input {
+    width: 100%; height: 46px; background: rgba(255,255,255,0.85);
+    border: 1.5px solid transparent; border-radius: 11px; padding: 0 14px;
+    color: #211A3B; font-size: 16px; outline: none; transition: border-color .15s;
+  }
+  .fld input::placeholder { color: #9A90B8; }
+  .fld input:focus { border-color: #6C5CE7; }
+  .seg-row { display: flex; gap: 8px; }
+  .seg {
+    flex: 1; height: 46px; background: rgba(255,255,255,0.85);
+    border: 1.5px solid transparent; border-radius: 11px; color: #211A3B;
+    font-size: 15px; cursor: pointer; transition: all .15s;
+  }
+  .seg.on { background: #6C5CE7; color: #fff; }
+  .err { display: none; font-size: 13px; color: #C0392B; margin: 12px 2px 0; }
+  .btn-main {
+    width: 100%; height: 50px; margin-top: 1.25rem; border-radius: 25px;
+    background: #6C5CE7; color: #fff; border: none; font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: transform .1s;
+  }
+  .btn-main:active { transform: scale(0.98); }
+  .done { display: none; text-align: center; padding: 2rem 0; }
+  .done .ok {
+    width: 60px; height: 60px; margin: 0 auto 14px; border-radius: 50%;
+    background: #6C5CE7; color: #fff; font-size: 34px; line-height: 60px;
+  }
+  /* профиль */
+  .prof-row { display: flex; align-items: center; gap: 14px; }
+  .avatar {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(140deg,#6C5CE7,#C06CE7);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 19px; font-weight: 600;
+  }
+  .sub-title { font-size: 12px; color: #564B7A; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 14px; }
+  .btn-sm {
+    margin-top: 12px; height: 38px; padding: 0 20px; border-radius: 19px;
+    background: #6C5CE7; color: #fff; border: none; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  /* нижние вкладки */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; display: flex;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255,255,255,0.6);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .tabbtn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 10px 0 12px; background: transparent; border: none;
+    color: #8A7FB0; font-size: 11px; cursor: pointer;
+  }
+  .tabbtn svg { width: 24px; height: 24px; }
+  .tabbtn.active { color: #6C5CE7; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ВКЛАДКА: ЗАЯВКА -->
+  <section id="tab_form">
+    <h1>Оставить заявку</h1>
+    <div class="sub">Заполни данные — это займёт минуту</div>
+
+    <div class="card" id="formCard" style="margin-top:1.25rem;">
+      <div class="fld"><label>Имя</label><input id="f_first" type="text" placeholder="Кирилл"></div>
+      <div class="fld"><label>Фамилия</label><input id="f_last" type="text" placeholder="Струк"></div>
+      <div class="fld"><label>Telegram</label><input id="f_tg" type="text" placeholder="@username"></div>
+      <div class="fld"><label>Телефон</label><input id="f_phone" type="tel" placeholder="+7 900 000-00-00"></div>
+      <div class="fld"><label>Email</label><input id="f_email" type="email" placeholder="name@mail.com"></div>
+      <div class="fld"><label>Пароль от аккаунта</label><input id="f_pass" type="password" placeholder="••••••••"></div>
+      <div class="fld">
+        <label>Оплата</label>
+        <div class="seg-row">
+          <button type="button" class="seg" data-pay="Оплачено">Оплачено</button>
+          <button type="button" class="seg" data-pay="Не оплачено">Пока нет</button>
+        </div>
+      </div>
+      <div class="err" id="err"></div>
+      <button type="button" class="btn-main" id="submit">Отправить заявку</button>
+    </div>
+
+    <div class="done" id="done">
+      <div class="ok">✓</div>
+      <div style="font-size:19px; font-weight:600;">Заявка отправлена</div>
+      <div class="sub">Спасибо, скоро свяжемся</div>
+    </div>
+  </section>
+
+  <!-- ВКЛАДКА: ПРОФИЛЬ -->
+  <section id="tab_profile" class="hidden">
+    <h1>Профиль</h1>
+
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="prof-row">
+        <div class="avatar" id="pf_ava">КС</div>
+        <div>
+          <div style="font-size:17px; font-weight:600;" id="pf_name">Кирилл Струк</div>
+          <div class="sub" id="pf_tg" style="margin-top:0;">@ck_prog</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="sub-title">Подписка на месяц</div>
+      <div style="display:flex; align-items:center; gap:18px;">
+        <svg width="92" height="92" viewBox="0 0 92 92">
+          <circle cx="46" cy="46" r="40" fill="none" stroke="rgba(108,92,231,0.18)" stroke-width="9"/>
+          <circle cx="46" cy="46" r="40" fill="none" stroke="#6C5CE7" stroke-width="9" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="100.5" transform="rotate(-90 46 46)"/>
+          <text x="46" y="42" text-anchor="middle" font-size="22" font-weight="600" fill="#211A3B">18</text>
+          <text x="46" y="60" text-anchor="middle" font-size="11" fill="#564B7A">дней</text>
+        </svg>
+        <div style="flex:1;">
+          <div style="font-size:15px; font-weight:600;">Активна</div>
+          <div class="sub" style="margin-top:3px;">Осталось 18 из 30 дней</div>
+          <div class="sub">до 26 октября 2026</div>
+          <button type="button" class="btn-sm" id="renew">Продлить</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- НИЖНИЕ ВКЛАДКИ -->
+<nav class="tabbar">
+  <button type="button" class="tabbtn active" data-tab="form">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    <span>Заявка</span>
+  </button>
+  <button type="button" class="tabbtn" data-tab="profile">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+    <span>Профиль</span>
+  </button>
+</nav>
+
+<script>
+(function () {
+  var tg = window.Telegram ? window.Telegram.WebApp : null;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // подставляем имя из Telegram в профиль, если доступно
+  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    var u = tg.initDataUnsafe.user;
+    var full = [u.first_name, u.last_name].filter(Boolean).join(" ");
+    if (full) {
+      document.getElementById("pf_name").textContent = full;
+      var init = (u.first_name ? u.first_name[0] : "") + (u.last_name ? u.last_name[0] : "");
+      if (init) document.getElementById("pf_ava").textContent = init.toUpperCase();
+    }
+    document.getElementById("pf_tg").textContent = u.username ? "@" + u.username : "";
+    // автозаполним форму тем, что Telegram уже знает
+    if (u.first_name) document.getElementById("f_first").value = u.first_name;
+    if (u.last_name) document.getElementById("f_last").value = u.last_name;
+    if (u.username) document.getElementById("f_tg").value = "@" + u.username;
+  }
+
+  // выбор оплаты
+  var pay = "";
+  document.querySelectorAll(".seg").forEach(function (b) {
+    b.addEventListener("click", function () {
+      pay = b.dataset.pay;
+      document.querySelectorAll(".seg").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+  });
+
+  var err = document.getElementById("err");
+  function showErr(m) { err.textContent = m; err.style.display = "block"; }
+  function clrErr() { err.style.display = "none"; }
+  ["f_first","f_last","f_tg","f_phone","f_email","f_pass"].forEach(function (id) {
+    document.getElementById(id).addEventListener("input", clrErr);
+  });
+
+  document.getElementById("submit").addEventListener("click", function () {
+    var val = function (id) { return document.getElementById(id).value.trim(); };
+    if (!val("f_first") || !val("f_last")) { showErr("Заполни имя и фамилию"); return; }
+    if (!val("f_phone")) { showErr("Укажи телефон"); return; }
+    if (!val("f_email") || val("f_email").indexOf("@") < 0) { showErr("Проверь email"); return; }
+    if (!val("f_pass")) { showErr("Введи пароль"); return; }
+    if (!pay) { showErr("Отметь статус оплаты"); return; }
+    clrErr();
+
+    var data = {
+      first_name: val("f_first"),
+      last_name: val("f_last"),
+      tg: val("f_tg"),
+      phone: val("f_phone"),
+      email: val("f_email"),
+      password: val("f_pass"),
+      payment: pay
+    };
+
+    if (tg && tg.sendData) {
+      tg.sendData(JSON.stringify(data));  // отправляем боту, окно закроется само
+    } else {
+      // режим предпросмотра в браузере (без Telegram)
+      document.getElementById("formCard").style.display = "none";
+      document.getElementById("done").style.display = "block";
+    }
+  });
+
+  document.getElementById("renew").addEventListener("click", function () {
+    if (tg) tg.showAlert("Оплата подписки появится позже.");
+    else alert("Оплата подписки появится позже.");
+  });
+
+  // переключение вкладок
+  function setTab(name) {
+    document.getElementById("tab_form").classList.toggle("hidden", name !== "form");
+    document.getElementById("tab_profile").classList.toggle("hidden", name !== "profile");
+    document.querySelectorAll(".tabbtn").forEach(function (t) {
+      t.classList.toggle("active", t.dataset.tab === name);
+    });
+  }
+  document.querySelectorAll(".tabbtn").forEach(function (t) {
+    t.addEventListener("click", function () { setTab(t.dataset.tab); });
+  });
+})();
+</script>
+</body>
+</html>
